@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Robert Firanji">
+    <title>Assignment - Kreiranje analognog časovnika</title>
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: linear-gradient(to left, #2c0ca0, #5d5b5b);
+            
+        }
+
+        canvas {
+            margin: 150px auto;
+            height: 600px;
+            border-radius: 50%;
+            box-shadow: 2px 2px 8px rgba(50, 50, 50, 0.3), -13px -7px 20px rgba(15, 15, 15, 1);
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <canvas id="canvas" width="700" height="700">
+        Your browser does not support canvas.
+    </canvas>
+
+    <script>
+
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+
+        var clockImage = new Image();
+        var clockImageLoaded = false;
+
+        clockImage.onload = function () {
+            clockImageLoaded = true;
+        }
+        clockImage.src = 'images/clock2.jpg';
+
+        /************************ Clock date *******************************************/
+
+        function createClock() {
+            addBackgroundImage();
+
+            var date = new Date();
+
+            hourHand(date);
+            minuteHand(date);
+            secondHand(date);
+
+            console.log(date);
+
+        }
+
+        /***************************** Clock app **************************************/
+
+        function clockApp() {
+            if (!clockImageLoaded) {
+                setTimeout('clockApp()', 100);
+                return;
+            }
+            context.translate(canvas.width / 2, canvas.height / 2);
+
+            createClock();
+            setInterval('createClock()', 1000);
+        }
+
+        clockApp();
+
+        /***************************** Clock image **************************************/
+
+        function addBackgroundImage() {
+            context.drawImage(clockImage, canvas.width / 2 * -1, canvas.height / 2 * -1, canvas.width, canvas.height);
+        }
+
+        function degreesToRadians(degrees) {
+            return (Math.PI / 180) * degrees;
+        }
+
+        /************************** Clock hour *****************************************/
+
+        function hourHand(date) {
+            var hours = date.getHours() + date.getMinutes() / 60;
+            var degrees = (hours * 360 / 12) % 360;
+
+            context.save();
+            context.fillStyle = '#181616';
+            context.strokeStyle = '#557';
+
+            context.rotate(degreesToRadians(degrees));
+
+            pointer(150, 7, 3);
+
+            context.restore();
+
+        }
+
+        /*************************** Clock minute ****************************************/
+
+        function minuteHand(date) {
+            var minutes = date.getMinutes() + date.getSeconds() / 60;
+
+            context.save();
+            context.fillStyle = '#181616';
+            context.strokeStyle = '#557';
+            context.rotate(degreesToRadians(minutes * 6));
+
+            pointer(250, 7, 5);
+
+            context.restore();
+        }
+
+        /***************************** Clock second **************************************/
+
+        function secondHand(date) {
+            var seconds = date.getSeconds();
+
+            context.save();
+            context.fillStyle = '#c30808';
+            context.globalAlpha = 0.8;
+            context.rotate(degreesToRadians(seconds * 6));
+
+            pointer(280, 4, 8);
+
+            context.restore();
+        }
+
+
+        /*************************** Clock pointer ****************************************/
+
+        function pointer(size, thickness, shadowOffset) {
+            thickness = thickness || 4;
+
+            context.shadowColor = '#557';
+            context.shadowBlur = 5;
+            context.shadowOffsetX = shadowOffset;
+            context.shadowOffsetY = shadowOffset;
+
+            context.beginPath();
+            context.moveTo(0, 0);
+            context.lineTo(thickness * -1, -10);
+            context.lineTo(0, size * -1);
+            context.lineTo(thickness, -10);
+            context.lineTo(0, 0);
+            context.fill();
+            context.stroke();
+        }
+
+        /*******************************************************************/
+
+    </script>
+
+</body>
+
+</html>
